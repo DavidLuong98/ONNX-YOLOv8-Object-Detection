@@ -19,8 +19,13 @@ class YOLOv8:
         return self.detect_objects(image)
 
     def initialize_model(self, path):
+        provider_options = [{"backend_path": "QnnHtp.dll"}]
+        options = onnxruntime.SessionOptions()
+        options.add_session_config_entry("session.disable_cpu_ep_fallback", "1")
         self.session = onnxruntime.InferenceSession(path,
-                                                    providers=onnxruntime.get_available_providers())
+                                                    sess_options=options,
+                                                    providers=["QNNExecutionProvider"],
+                                                    provider_options=provider_options)
         # Get model info
         self.get_input_details()
         self.get_output_details()
